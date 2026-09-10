@@ -20,7 +20,7 @@ FIELDS = {
     "instructor": (132, 268),
     "today_date": (392, 268),
     "course": (112, 294.9),
-    "section_number": (406, 294.9),
+    "section_number": (403, 294.9),
     "destination": (132, 348.5),
     "address": (118, 375.4),
     "phone_area": (372, 402.3),
@@ -31,6 +31,11 @@ FIELDS = {
 }
 
 DAY_CLASS_CHECKBOX = (75.5, 322)
+
+# The fixed section-number strings are longer than anything hand-written
+# would be, so that field gets a smaller font to keep it on the line.
+SMALL_FONT_FIELDS = {"section_number"}
+SMALL_FONT_SIZE = 8.5
 
 PURPOSE_LINES = [
     # (x, baseline_y, max_width)
@@ -68,7 +73,8 @@ def fill_field_trip_request(data: dict) -> bytes:
     for key, (x, y) in FIELDS.items():
         value = str(data.get(key, "") or "")
         if value:
-            page.insert_text((x, y), value, fontsize=FONT_SIZE, fontname=FONT)
+            fontsize = SMALL_FONT_SIZE if key in SMALL_FONT_FIELDS else FONT_SIZE
+            page.insert_text((x, y), value, fontsize=fontsize, fontname=FONT)
 
     # "Day Class" is always checked per how this form is actually used.
     x, y = DAY_CLASS_CHECKBOX

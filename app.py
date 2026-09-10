@@ -4,7 +4,17 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from packet.config import COACHES, DEFAULT_STUDENT_FORMS_DIR, DEFAULT_OUTPUT_DIR, LEAVE_REASON_FIELDS
+from packet.config import (
+    COACHES,
+    DEFAULT_STUDENT_FORMS_DIR,
+    DEFAULT_OUTPUT_DIR,
+    FIELD_TRIP_COURSE,
+    FIELD_TRIP_PURPOSE,
+    LEAVE_REASON_FIELDS,
+    LEAVE_REQUEST_DEPARTMENT,
+    LEAVE_REQUEST_SUPERVISOR,
+    SECTION_NUMBER_OPTIONS,
+)
 from packet.field_trip_form import fill_field_trip_request
 from packet.leave_request_form import fill_leave_request
 from packet.roster import build_roster_pdf
@@ -30,8 +40,9 @@ with col1:
     tournament_name = st.text_input("Tournament / event name", placeholder="e.g. Golden Gate Invitational")
     instructor = st.text_input("Instructor name(s)", value="Paul Villa")
     today_date = st.date_input("Today's date", value=dt.date.today())
-    course = st.text_input("Course")
-    section_number = st.text_input("Section number")
+    st.text_input("Course", value=FIELD_TRIP_COURSE, disabled=True)
+    semester = st.radio("Semester", list(SECTION_NUMBER_OPTIONS.keys()), horizontal=True)
+    st.caption(f"Section number(s): {SECTION_NUMBER_OPTIONS[semester]}")
 with col2:
     destination = st.text_input("Destination")
     address = st.text_input("Address")
@@ -44,14 +55,13 @@ trip_dates = col3.text_input("Date(s) of trip", placeholder="e.g. 3/12 - 3/15")
 time_from = col4.text_input("Time from (depart)", placeholder="e.g. 9:35am")
 time_to = col5.text_input("Time to (return)", placeholder="e.g. 5:00pm")
 
-purpose = st.text_area("Purpose of trip", height=80,
-                        placeholder="e.g. Traveling to compete at the Golden Gate Invitational speech tournament.")
+st.text_input("Purpose of trip", value=FIELD_TRIP_PURPOSE, disabled=True)
 
 trip_data = {
     "instructor": instructor,
     "today_date": today_date.strftime("%m/%d/%Y") if today_date else "",
-    "course": course,
-    "section_number": section_number,
+    "course": FIELD_TRIP_COURSE,
+    "section_number": SECTION_NUMBER_OPTIONS[semester],
     "destination": destination,
     "address": address,
     "phone_area": phone_area,
@@ -59,7 +69,7 @@ trip_data = {
     "trip_dates": trip_dates,
     "time_from": time_from,
     "time_to": time_to,
-    "purpose": purpose,
+    "purpose": FIELD_TRIP_PURPOSE,
 }
 
 # ---------------------------------------------------------------- Attendees
@@ -102,13 +112,9 @@ invite_file = st.file_uploader("Tournament invitation PDF", type=["pdf"])
 leave_request_inputs = {}
 if selected_coaches:
     st.header("4. Leave Request details")
+    st.caption(f"Department: {LEAVE_REQUEST_DEPARTMENT} · Supervisor/Manager: {LEAVE_REQUEST_SUPERVISOR}")
     for coach in selected_coaches:
-        defaults = COACHES[coach]
         with st.expander(f"Leave Request — {coach}", expanded=True):
-            lc1, lc2 = st.columns(2)
-            department = lc1.text_input("Department", value=defaults["department"], key=f"dept_{coach}")
-            supervisor = lc2.text_input("Supervisor/Manager", value=defaults["supervisor"], key=f"sup_{coach}")
-
             reason_label = st.selectbox("Reason for leave (checkbox on form)", list(LEAVE_REASON_FIELDS.keys()),
                                          index=list(LEAVE_REASON_FIELDS.keys()).index("Meeting/Conference"),
                                          key=f"reason_{coach}")
@@ -116,8 +122,7 @@ if selected_coaches:
             explanation = st.text_input("Explanation", value=tournament_name, key=f"expl_{coach}")
             dates_for_leave = st.text_input("Dates for leave request", value=trip_dates, key=f"dates_{coach}")
             default_reason_text = (
-                f"Taking students to {tournament_name} in {destination}"
-                if tournament_name or destination else ""
+                f"Taking student to a tournament at {destination}" if destination else ""
             )
             reason_for_leave = st.text_area("Reason for leave", value=default_reason_text, height=60,
                                              key=f"reasontext_{coach}")
@@ -127,8 +132,8 @@ if selected_coaches:
                                              key=f"courses_{coach}")
 
             leave_request_inputs[coach] = {
-                "department": department,
-                "supervisor": supervisor,
+                "department": LEAVE_REQUEST_DEPARTMENT,
+                "supervisor": LEAVE_REQUEST_SUPERVISOR,
                 "reason_field": LEAVE_REASON_FIELDS[reason_label],
                 "explanation": explanation,
                 "dates_for_leave": dates_for_leave,
