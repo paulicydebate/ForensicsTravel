@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Generated packets and student PII never get committed.
+output/*
+!output/.gitkeep
+data/student_forms/*
+!data/student_forms/.gitkeep
