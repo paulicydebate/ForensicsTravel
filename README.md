@@ -22,8 +22,24 @@ stays local.
 
 ## Setup
 
+**Easiest: double-click to launch.** No terminal typing needed after this.
+
+- **macOS**: double-click `run_mac.command`. The first time, macOS will
+  refuse to open it ("unidentified developer") — right-click it, choose
+  **Open**, then confirm. After that, double-clicking just works.
+- **Windows**: double-click `run_windows.bat`.
+
+The first run takes a minute or two (it sets up a private Python
+environment and installs the three packages this app needs). Every run
+after that opens in a few seconds. A terminal/console window stays open
+while the app runs — that's normal, just leave it be; closing that window
+stops the app.
+
+If you'd rather run it by hand instead:
+
 ```bash
 pip install -r requirements.txt
+streamlit run app.py
 ```
 
 ### Student emergency forms
@@ -36,11 +52,17 @@ into the checkbox label you'll pick from when building a packet.
 ### Coaches
 
 The four coaches who can appear on a Leave Request are fixed in
-`packet/config.py` (`COACHES`): Robert Hawkins, Tanya Prabhakar, Sydney
-Alexander, and Paul Villa, along with each one's department/supervisor
-defaults where known. Edit that file if the roster of coaches ever changes.
+`packet/config.py` (`COACHES`): Paul Villa, Robert Hawkins, Tanya
+Prabhakar, and Sydney Alexander. The Leave Request's Supervisor/Manager
+and Department are also fixed there (`LEAVE_REQUEST_SUPERVISOR`,
+`LEAVE_REQUEST_DEPARTMENT`) since they're the same for everyone. Edit
+that file if the roster of coaches, the supervisor, or the department
+ever changes.
 
 ## Running it
+
+Double-click `run_mac.command` / `run_windows.bat` (see Setup above), or
+run it by hand:
 
 ```bash
 streamlit run app.py
@@ -51,11 +73,11 @@ running locally, nothing leaves your machine.
 
 Then, for each trip:
 
-1. Fill in the trip details (instructor, dates, destination, purpose, etc.)
+1. Fill in the trip details (instructor, dates, destination, semester, etc.)
 2. Check off which coaches and students are attending
 3. Upload the tournament invitation PDF
 4. For each attending coach, review/edit the Leave Request details
-   (department, supervisor, reason, and any classes they'll miss)
+   (reason, explanation, dates, and any classes they'll miss)
 5. Click **Build packet** and download the merged PDF
 
 ## How the forms get filled
